@@ -17,36 +17,89 @@
   <svg id="mindmap"></svg>
 
   <script>
-    async function init() {
-      const status = document.getElementById('status');
-      
-      // Safety Check: Local File Restriction
-      if (window.location.protocol === 'file:') {
-        status.innerHTML = "<strong>Security Error:</strong> Browsers block 'fetch' for local files. <br>To test this locally, please use a local server (like Live Server in VS Code) or upload these files to GitHub.";
-        return;
-      }
+    const markdown = `---
+markmap:
+  colorFreezeLevel: 2
+---
+# Detailed Insights & Methods from Granola Video
+## Root Insight
+- Lack of focus isn't the problem
+- Problem: Inability to direct existing attention
+- Brain's management system = **Executive Functions (EF)**
+## Executive Functions (EF)
+### Role of EF
+- Direct attention
+- Control impulses
+- Maintain goals and plans
+### Symptoms of weak EF
+- Acting on every impulse
+- Inability to prioritize
+- Task switching and distractions
+## Causes of EF Weakness
+### Environmental Factors
+- Information overload
+- Constant notifications & digital distractions
+- Doomscrolling and multitasking
+### Developmental (ADHD)
+- Inborn executive dysfunction
+- Dopamine imbalance
+- Remains even without external triggers
+## Core Problems & Solutions
+### 1. Anxiety/Impulse Loop
+- **Cause**
+  - Overloaded working memory
+  - High cognitive load
+- **Solutions**
+  - **Kaizen Log**
+    - Morning brain dump
+    - Pick a "daily highlight"
+  - **Impulse Log**
+    - Note every impulse without acting on it
+    - Builds pause between thought & action
+### 2. Lack of Clarity & Energy Management
+- **Tool: Granola**
+  - Real-time transcription
+  - Detects tasks, deadlines, key decisions
+- **Workflow Fix**
+  - Categorize tasks: Urgent, Deadline, Admin, Creative
+  - Use sprints instead of rigid time slots
+### 3. Low Boredom Tolerance
+- **Fix: 10-Minute Focus Game**
+  - Set visual timer for 10 mins
+  - Task open in front, no movement allowed
+  - +10 if you stay, -10 if you move
+## Mental Overload Strategy
+- Don't rely on brain to remember
+- Use it to think, analyze, and solve
+- Offload tasks and info to external systems
+## Dopamine Hygiene
+- Avoid overstimulation
+- Actively train brain to handle low-reward tasks
+## Final Advice
+- Don't fix everything at once
+- Start with one method
+- Build slow, mark progress`;
 
+    function render() {
       try {
-        // 1. Fetch the external markdown file
-        const response = await fetch('map.md');
-        if (!response.ok) throw new Error("Could not find map.md. Ensure it is in the same folder.");
-        const markdown = await response.text();
-
-        // 2. Transform and Render
+        // Accessing the transformer from the global markmap object
         const transformer = new markmap.Transformer();
         const { root } = transformer.transform(markdown);
         const { Markmap } = markmap;
         
         Markmap.create('#mindmap', null, root);
-        console.log("Mindmap loaded successfully from map.md");
       } catch (err) {
-        status.innerText = "Error: " + err.message;
+        document.getElementById('status').innerText = "Error: " + err.message;
         console.error(err);
       }
     }
 
-    // Run when the page is ready
-    window.addEventListener('load', init);
+    // This ensures the script runs ONLY after all CDN files are fully loaded
+    if (window.markmap) {
+      render();
+    } else {
+      window.addEventListener('load', render);
+    }
   </script>
 </body>
 </html>
