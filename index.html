@@ -1,14 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Granola Mindmap</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Granola Mindmap</title>
+  <style>
+    body, html, #mindmap { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background: #fdfdfd; }
+    #status { position: absolute; top: 10px; left: 10px; font-family: sans-serif; color: red; font-size: 14px; z-index: 10; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-view"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markmap-lib"></script>
 </head>
 <body>
-    <h1>Welcome to the Granola Mindmap</h1>
-    <p>This application helps you create mindmaps with ease.</p>
-    <script src="script.js"></script>
+  <div id="status"></div>
+  <svg id="mindmap"></svg>
+
+  <script>
+    async function init() {
+      const status = document.getElementById('status');
+      
+      // Safety Check: Local File Restriction
+      if (window.location.protocol === 'file:') {
+        status.innerHTML = "<strong>Security Error:</strong> Browsers block 'fetch' for local files. <br>To test this locally, please use a local server (like Live Server in VS Code) or upload these files to GitHub.";
+        return;
+      }
+
+      try {
+        // 1. Fetch the external markdown file
+        const response = await fetch('map.md');
+        if (!response.ok) throw new Error("Could not find map.md. Ensure it is in the same folder.");
+        const markdown = await response.text();
+
+        // 2. Transform and Render
+        const transformer = new markmap.Transformer();
+        const { root } = transformer.transform(markdown);
+        const { Markmap } = markmap;
+        
+        Markmap.create('#mindmap', null, root);
+        console.log("Mindmap loaded successfully from map.md");
+      } catch (err) {
+        status.innerText = "Error: " + err.message;
+        console.error(err);
+      }
+    }
+
+    // Run when the page is ready
+    window.addEventListener('load', init);
+  </script>
 </body>
 </html>
